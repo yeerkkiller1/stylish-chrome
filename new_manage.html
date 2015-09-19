@@ -1,0 +1,64 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.6.0/addon/hint/show-hint.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.6.0/codemirror.css">
+
+<link rel="stylesheet" href="/new_manage.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.6.0/codemirror.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.6.0/addon/hint/show-hint.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.6.0/addon/hint/css-hint.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.6.0/mode/css/css.js"></script>
+
+<script src="https://cdn.firebase.com/js/client/2.2.9/firebase.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.6/angular.js"></script>
+<script src="main.js"></script>
+
+
+<div ng-app="stylishShare" ng-controller="rootCtrl">
+	<div class="noauthUI" ng-if="!authenticated">
+		<button class="centerInParent" ng-click="login()">Login</button>
+	</div>
+	<div class="authUI" ng-if="authenticated">
+		<div>{{auth.google.displayName}}</div>
+		<button ng-click="logout()">Logout</button>
+	</div>
+	
+	<div class="mainBody">
+		<div>
+			<div>
+				<button ng-click="addStyle()">Add Style</button>
+			</div>
+		</div>
+		
+		<h2>Styles</h2>
+		<div>
+			<div class="styleHolder" ng-repeat="style in data.styles">
+				<div class="flex">
+					<div class="flex flexGrow smallMarginChildren">
+						<h3 class="marginTop0 marginBottom0">Urls</h3>
+						<button ng-click="addUrl(style, '')">New Url</button>
+					</div>
+					<div>
+						<button ng-disabled="!changed" ng-click="save(style); lastSaved = style.content;">Save (ctrl+s)</button>
+						<button ng-click="delete(style)">Delete</button>
+					</div>
+				</div>
+				<div class="smallMarginChildren">
+					<div>
+						
+					</div>
+					<div ng-repeat="(key, url) in style.urls">
+						<input ng-model="url" ng-change="updateUrl(style, key, url)" />
+					</div>
+				</div>
+				<css-editor 
+					content="style.content"
+					style="style"
+					save="save"
+					changed="changed"
+					last-saved="lastSaved"
+					ng-style="{height: lines(style.content) * 20 + 100 + 'px'}"
+				></css-editor>
+			</div>
+		</div>
+	</div>
+</div>

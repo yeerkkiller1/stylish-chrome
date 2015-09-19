@@ -1,0 +1,74 @@
+body {
+	margin: 0px;
+	font-family: monospace;
+}
+button {
+	font-family: monospace;
+}
+
+.centerInParent {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translateX(-50%) translateY(-50%);
+}
+
+.marginBottom0 {
+	margin-bottom: 0px;
+}
+.marginTop0 {
+	margin-top: 0px;
+}
+.smallMarginChildren > * {
+	margin: 3px;
+}
+.flex {
+	display: flex;
+}
+.flexGrow {
+	flex-grow: 1;
+}
+
+.noauthUI {
+	width: 100vw;
+	height: 100vh;
+	position: absolute;
+	z-index: 100;
+	left: 0px;
+	top: 0px;
+	background: hsla(0, 0%, 0%, 0.2);
+}
+.noauthUI button {
+	font-size: 80px;
+}
+
+.authUI {
+	background: hsla(0, 0%, 0%, 0.1);
+	border-bottom: 1px solid black;
+	
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	
+	margin-bottom: 6px;
+}
+
+.authUI > * {
+	margin: 5px;
+}
+
+.mainBody {
+	margin: 6px;
+}
+
+css-editor {
+	display: block;
+	height: 500px;
+	max-height: 600px;
+	overflow: auto;
+}
+
+.styleHolder {
+	border: 1px solid hsl(0, 0%, 70%);
+    padding: 4px;
+}
