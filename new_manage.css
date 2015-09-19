@@ -12,6 +12,9 @@ button {
 	top: 50%;
 	transform: translateX(-50%) translateY(-50%);
 }
+.width100 {
+	width: 100%;
+}
 
 .marginBottom0 {
 	margin-bottom: 0px;
@@ -71,4 +74,40 @@ css-editor {
 .styleHolder {
 	border: 1px solid hsl(0, 0%, 70%);
     padding: 4px;
+	position: relative;
+	z-index: 1;
+}
+
+.styleHolder:not(.styleEnabled):before {
+	content: " ";
+	z-index: 10;
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	width: 100%;
+	height: 100%;
+	background: hsla(0, 0%, 0%, 0.1);
+	pointer-events: none;
+}
+
+.styleHolder .disabledButton {
+	font-size: 32px;
+	font-weight: bold;
+	z-index: 11;
+	position: absolute;
+	left: 50%;
+	top: 0%;
+	transform: translateX(-50%);
+	opacity: 0.5;
+	cursor: pointer;
+}
+
+.disabledButton:hover:after {
+	content: "";
+	position: absolute;
+	width: 120%;
+	height: 120%;
+	left: -10%;
+	top: -10%;
+	background: hsla(0, 0%, 0%, 0.1);
 }

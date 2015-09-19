@@ -43,8 +43,15 @@ mod.controller("rootCtrl", function($scope) {
 		apply($scope);
 	}
 	
-	function getStyleRef(style) {
-		return writeRef.child("styles").child(style.styleID);
+	function getReadRef(userUID) {
+		return ref.child("userData").child(userUID);
+	}
+	function getStyleRef(style, userUID) {
+		var readRef = writeRef;
+		if(userUID) {
+			readRef = getReadRef(userUID);
+		}
+		return readRef.child("styles").child(style.styleID);
 	}
 	
 	$scope.addStyle = function() {
@@ -62,7 +69,7 @@ mod.controller("rootCtrl", function($scope) {
 	$scope.delete = function(style) {
 		if(confirm("Sure you want to delete " + style.content)) {
 			var styleRef = getStyleRef(style);
-			styleRef.remove();
+			styleRef.child("deleted").set(true);
 		}
 	};
 	$scope.lines = function(text) {
@@ -77,6 +84,10 @@ mod.controller("rootCtrl", function($scope) {
 	$scope.updateUrl = function(style, key, value) {
 		var styleRef = getStyleRef(style);
 		styleRef.child("urls").child(key).set(value);
+	};
+	
+	$scope.toggleEnableStyle = function(style) {
+		getStyleRef(style).child("enabled").set(!style.enabled);
 	};
 });
 

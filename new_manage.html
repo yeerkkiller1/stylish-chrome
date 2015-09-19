@@ -30,8 +30,18 @@
 		</div>
 		
 		<h2>Styles</h2>
-		<div>
-			<div class="styleHolder" ng-repeat="style in data.styles">
+		<div>		
+			<div class="styleHolder" 
+				 ng-repeat="(styleID, style) in data.styles"
+				 ng-if="!deleted"
+				 ng-class="{styleEnabled: style.enabled}">
+				<div class="disabledButton" 
+					ng-click="toggleEnableStyle(style)"
+					ng-mouseover="hovered = true"
+					ng-mouseout="hovered = false">
+					{{ style.enabled ? (hovered ? "Disable" : "Enabled") 
+					: (hovered ? "Enable" : "Disabled") }}
+				</div>
 				<div class="flex">
 					<div class="flex flexGrow smallMarginChildren">
 						<h3 class="marginTop0 marginBottom0">Urls</h3>
@@ -47,7 +57,7 @@
 						
 					</div>
 					<div ng-repeat="(key, url) in style.urls">
-						<input ng-model="url" ng-change="updateUrl(style, key, url)" />
+						<input class="width100" ng-model="url" ng-change="updateUrl(style, key, url)" />
 					</div>
 				</div>
 				<css-editor 
