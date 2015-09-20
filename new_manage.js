@@ -4,6 +4,28 @@ var apply = function(scope) {
 	}
 };
 
+var setAuth = (function() {
+	var auth;
+	var onAuth = [];
+	
+	function sendAuth() {
+		var authEvent = document.createEvent("CustomEvent");
+		authEvent.initCustomEvent("auth", true, true, auth);
+		document.dispatchEvent(authEvent);
+	}
+	
+	function setAuth(newAuth) {
+		auth = newAuth;
+		sendAuth();
+	}
+	
+	window.addEventListener("getAuth", function(event){
+		sendAuth();
+	});
+	
+	return setAuth;
+})();
+
 var mod = angular.module("stylishShare", []);
 mod.controller("rootCtrl", function($scope) {
 	var ref = new Firebase("https://stylish-share.firebaseio.com/");
@@ -22,6 +44,11 @@ mod.controller("rootCtrl", function($scope) {
 			writeRef = ref.child("userData").child(auth.uid);
 			writeRef.on("value", allOurData);
 		}
+		
+		if(auth) {
+			setAuth(auth.auth.uid);
+		}
+		
 		apply($scope);
 	});
 	$scope.login = function() {
@@ -55,8 +82,10 @@ mod.controller("rootCtrl", function($scope) {
 	}
 	
 	$scope.addStyle = function() {
-		var styleRef = writeRef.child("styles").push();
-		styleRef.child("createDate").set(Firebase.ServerValue.TIMESTAMP);
+		var styleRef = writeRef.child("styles").push({
+			createDate: Firebase.ServerValue.TIMESTAMP,
+			content: ""
+		});
 		styleRef.child("styleID").set(styleRef.key());
 	};
 	$scope.save = function(style) {
@@ -73,6 +102,7 @@ mod.controller("rootCtrl", function($scope) {
 		}
 	};
 	$scope.lines = function(text) {
+		if(!text) return 1;
 		return text.split("\n").length;	
 	};
 	
@@ -87,7 +117,8 @@ mod.controller("rootCtrl", function($scope) {
 	};
 	
 	$scope.toggleEnableStyle = function(style) {
-		getStyleRef(style).child("enabled").set(!style.enabled);
+		var data = $scope.data;
+		writeRef.child("enabled").child(style.styleID).set(!(data.enabled && data.enabled[style.styleID]));
 	};
 });
 

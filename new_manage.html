@@ -10,7 +10,7 @@
 
 <script src="https://cdn.firebase.com/js/client/2.2.9/firebase.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.6/angular.js"></script>
-<script src="main.js"></script>
+<script src="new_manage.js"></script>
 
 
 <div ng-app="stylishShare" ng-controller="rootCtrl">
@@ -34,12 +34,12 @@
 			<div class="styleHolder" 
 				 ng-repeat="(styleID, style) in data.styles"
 				 ng-if="!deleted"
-				 ng-class="{styleEnabled: style.enabled}">
+				 ng-class="{styleDisabled: !data.enabled || !data.enabled[styleID]}">
 				<div class="disabledButton" 
 					ng-click="toggleEnableStyle(style)"
 					ng-mouseover="hovered = true"
 					ng-mouseout="hovered = false">
-					{{ style.enabled ? (hovered ? "Disable" : "Enabled") 
+					{{ data.enabled && data.enabled[styleID] ? (hovered ? "Disable" : "Enabled") 
 					: (hovered ? "Enable" : "Disabled") }}
 				</div>
 				<div class="flex">

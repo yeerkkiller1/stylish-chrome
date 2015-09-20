@@ -152,8 +152,23 @@
 		<script src="storage.js"></script>
 		<script src="messaging.js"></script>
 		<script src="apply.js"></script>
+		
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.6/angular.js"></script>
+		<script src="https://cdn.firebase.com/js/client/2.2.9/firebase.js"></script>
 </head>
-<body id="stylish-popup">
+<body id="stylish-popup" ng-app="popup" ng-controller="rootCtrl">
+
+	<div>
+		<button ng-click="logout()">Logout</button>
+	</div>
+	
+	<div>
+		<div style="border: 1px solid hsl(0, 0%, 80%); padding: 2px; margin: 2px;" ng-repeat="style in styleUrls">
+			<div ng-repeat="url in style">
+				{{url}}
+			</div>
+		</div>
+	</div>
 
 	<div id="unavailable"><div class="left-gutter"></div><div class="main-controls"><span id="unavailable-message" i18n-text="stylishUnavailableForURL"></span></div></div>
 
@@ -171,7 +186,7 @@
 		<div class="left-gutter"></div>
 		<div class="main-controls">
 			<div id="find-styles"><a id="find-styles-link" href="#" i18n-text="findStylesForSite"></a></div>
-			<div id="manage-styles"><a id="open-manage-link" href="manage.html" i18n-text="openManage"></a></div>
+			<div id="manage-styles"><a id="open-manage-link" href="http://localhost:8081/new_manage.html" i18n-text="openManage"></a></div>
 			<div id="write-style"><span id="write-style-for" i18n-text="writeStyleFor"></span></div>
 		</div>
 	</div>

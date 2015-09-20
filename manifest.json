@@ -1,9 +1,10 @@
 {
-	"name": "Stylish",
+	"name": "Stylish Share",
 	"version": "1.3.1",
 	"description": "__MSG_description__",
 	"homepage_url": "https://userstyles.org",
 	"manifest_version": 2,
+	"content_security_policy": "script-src https://ajax.googleapis.com https://cdn.firebase.com https://stylish-share.firebaseio.com https://*.firebaseio.com 'self'; object-src 'self'",
 	"icons": {
 		"16": "16.png",
 		"48": "48.png",
@@ -30,7 +31,7 @@
 	"content_scripts": [
 		{
 			"matches": ["<all_urls>"],
-			"run_at": "document_start",
+			"run_at": "document_end",
 			"all_frames": true,
 			"js": ["apply.js"]
 		},

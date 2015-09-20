@@ -30,7 +30,86 @@ function webNavigationListener(method, data) {
 	});
 }
 
+var ports = [];
+var authRequestPorts = [];
+var portsWithAuth = [];
+
+var auth;
+
+var port = chrome.runtime.connect({name: "stylishChrome"});
+chrome.runtime.onConnect.addListener(function(port) {
+	if (port.name === "stylishChrome") {
+		ports.push(port);
+		port.onDisconnect.addListener(function() {
+			removePort(ports);
+			removePort(authRequestPorts);
+			removePort(portsWithAuth);
+			function removePort(ports) {
+				for(var ix = ports.length - 1; ix >= 0; ix--) {
+					if(ports[ix] === port) {
+						ports.splice(ix, 1);
+					}
+				}
+			}
+		});
+		
+		console.log("stylishChrome port opened");
+		port.onMessage.addListener(function(message) {
+			console.log("Background got message", message);
+			if(message.method === "contentFromAuth") {
+				if (message.auth) {
+					auth = message.auth;
+					console.log("Sending auth to " + authRequestPorts.length + " clients")
+					authRequestPorts.forEach(function(port){
+						port.postMessage({method: "nonAuthContentFromAuth", auth: auth});
+					});
+				}
+			} else if (message.method === "nonAuthContentGetAuth") {
+				console.log("Got request for auth");
+				if (auth) {
+					console.log("Replying with auth", auth);
+					port.postMessage({method: "nonAuthContentFromAuth", auth: auth});
+				} else {
+					console.warn("No auth when auth was requested. Waiting for auth.");
+					openURL({url: "http://localhost:8081/new_manage.html" }, true);
+					authRequestPorts.push(port);
+				}
+			}
+		});
+		port.postMessage({method: "contentGetAuth"});
+	}
+});
+
+/*
+var auth;
+var onAuth = [];
+try { auth = JSON.parse(localStorage["auth"]); } catch(e){}
 chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
+	if (request.method == "auth") {
+		if(auth) {
+			console.log("Got auth");
+			auth = request.auth;
+			console.log(auth);
+			//localStorage["auth"] = JSON.stringify(auth);
+			onAuth.forEach(function(c){c(auth)});
+			onAuth = [];
+			//Tells it we are asynchronous
+			return true;
+		}
+	} else if(request.method == "getAuth") {
+		if(!auth) {
+			console.log("Giving auth");
+			onAuth.push(sendResponse);
+		} else {
+			console.log("Queuing auth");
+			sendResponse(auth);	
+		}
+	}
+});
+*/
+
+chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
+	console.log(request.method);
 	switch (request.method) {
 		case "getStyles":
 			var styles = getStyles(request, sendResponse);
@@ -388,16 +467,20 @@ chrome.tabs.onAttached.addListener(function(tabId, data) {
 	});
 });
 
-function openURL(options) {
-	chrome.tabs.query({currentWindow: true, url: options.url}, function(tabs) {
+function openURL(options, silentReload) {
+	chrome.tabs.query({url: options.url}, function(tabs) {
 		// switch to an existing tab with the requested url
 		if (tabs.length) {
-			chrome.tabs.highlight({windowId: tabs[0].windowId, tabs: tabs[0].index}, function (window) {});
+			if(silentReload) {
+				chrome.tabs.reload(tabs[0].id);
+			} else {
+				chrome.tabs.highlight({windowId: tabs[0].windowId, tabs: tabs[0].index}, function (window) {});
+			}
 		} else {
 			delete options.method;
 			getActiveTab(function(tab) {
 				// re-use an active new tab page
-				chrome.tabs[tab.url == "chrome://newtab/" ? "update" : "create"](options);
+				chrome.tabs[tab && tab.url == "chrome://newtab/" ? "update" : "create"](options);
 			});
 		}
 	});

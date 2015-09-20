@@ -1,3 +1,69 @@
+var ref = new Firebase("https://stylish-share.firebaseio.com/");
+
+var apply = function(scope) {
+	if(!scope.$root.$$phase) {
+		scope.$apply();
+	}
+};
+
+var mod = angular.module("popup", []);
+mod.controller("rootCtrl", function($scope) {
+	//{ [styleID]: string[] }
+	$scope.styleUrls = {};
+	$scope.enabledIDs = {};
+	
+	var userRef;
+	var enabledRef;
+	
+	function readEnabledName(urlsSnapshot) {
+		var styleID = urlsSnapshot.ref().parent().key();
+		var urlsObj = urlsSnapshot.val();
+		var urls = [];
+		for(var key in urlsObj) {
+			urls.push(urlsObj[key]); 
+		}
+		$scope.styleUrls[styleID] = urls;
+		apply($scope);
+	}
+	
+	function enabledDataChanged(snapshot) {
+		var enabled = snapshot.val();
+		$scope.enabledIDs = {};
+		for(var styleID in enabled) {
+			$scope.enabledIDs[styleID] = enabled[styleID];
+			if(!enabled[styleID]) continue;
+			var urlRef = userRef.child("styles").child(styleID).child("urls");
+			urlRef.off("value", readEnabledName);
+			urlRef.on("value", readEnabledName);
+		}
+		apply($scope);
+	}
+	
+	function setAuth(auth) {
+		console.log(auth);
+		if (enabledRef) {
+			enabledRef.off("value", enabledDataChanged);
+		}
+		userRef = ref.child("userData").child(auth.uid);
+		enabledRef = userRef.child("enabled");
+		enabledRef.on("value", enabledDataChanged);
+	}
+	
+	var port = chrome.runtime.connect({name: "stylishChrome"});
+	var bootMessage = { method: "popupBoot", time: +new Date() };
+	console.log("Popup booting with", bootMessage);
+	port.postMessage(bootMessage);
+	port.onMessage.addListener(function(message) {
+		console.log("popup got message", message);
+		if (message.method === "nonAuthContentFromAuth") {
+			console.log("Got auth", message.auth);
+			setAuth({uid: message.auth});
+		}
+	});
+
+	port.postMessage({ method: "nonAuthContentGetAuth" });
+});
+
 var writeStyleTemplate = document.createElement("a");
 writeStyleTemplate.className = "write-style-link";
 

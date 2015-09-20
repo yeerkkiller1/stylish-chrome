@@ -78,7 +78,7 @@ css-editor {
 	z-index: 1;
 }
 
-.styleHolder:not(.styleEnabled):before {
+.styleHolder.styleDisabled:before {
 	content: " ";
 	z-index: 10;
 	position: absolute;
